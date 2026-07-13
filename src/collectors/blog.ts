@@ -53,7 +53,13 @@ async function fetchSitemapUrls(url: string, depth = 0): Promise<SitemapUrl[]> {
 async function fetchPageMeta(url: string): Promise<{ title: string; description: string }> {
   try {
     const html = await fetchText(url);
-    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? '')
+    // og:title 通常比 <title> 更干净；两者都取不到时上层回退 URL slug
+    const rawTitle =
+      html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)["']/i)?.[1] ??
+      html.match(/<meta[^>]+content=["']([^"']*)["'][^>]+property=["']og:title["']/i)?.[1] ??
+      html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ??
+      '';
+    const title = rawTitle
       .replace(/\s*[\\|–—-]\s*(OpenAI|Anthropic|Google DeepMind)\s*$/i, '')
       .trim();
     const description =

@@ -1,134 +1,199 @@
 import type { InsightItem } from '../types.js';
+import {
+  FOCUS_DIRECTIONS,
+  MIN_REPORT_RELEVANCE,
+  RESEARCH_DIRECTIONS,
+} from '../config.js';
 import { chat, llmAvailable, parseJsonResponse } from '../analysis/llm.js';
 import { ymd } from '../util/dates.js';
 import {
   companyLabel,
-  compactForLlm,
+  displayTitle,
   groupByCompany,
-  groupByTrack,
   mdLink,
   orderedCompanies,
-  trackLabel,
 } from './common.js';
 
-const HIGHLIGHT_LIMIT = 8;
+const MAX_DIRECTIONS = 6;
+const MAX_ITEMS_PER_DIRECTION = 4;
+
+const DIRECTION_LABELS = new Map(RESEARCH_DIRECTIONS.map((d) => [d.id, d.label]));
 
 interface WeeklyNarrative {
-  summary: string;
+  tldr: string[];
+  /** 头条条目 id + 为什么重要 */
+  headlines: Array<{ id: string; why: string }>;
+  direction_summaries: Record<string, string>;
+  company_signals: Record<string, string>;
   watch: string[];
 }
 
+const NARRATIVE_PROMPT = `你是 AI 行业战略分析师，为技术决策者撰写周报的编辑判断部分。基于给定的本周情报条目（已含赛道 track、研究方向 directions、相关性 relevance），输出严格 JSON（无其他文字、无代码围栏）：
+{
+ "tldr": ["<本周要点，3 条，每条 ≤40 字，覆盖最重要的变化>"],
+ "headlines": [{"id": "<从输入中选出本周最重要的 1-3 条的 id>", "why": "<为什么重要：对行业格局/技术路线的影响判断，一句话>"}],
+ "direction_summaries": {"<direction id>": "<该方向本周小结：发生了什么、往哪个方向演进，一句话>"},
+ "company_signals": {"<company>": "<该公司本周战略信号的一句话判断，如'以客户案例为 DevDay 造势'>"},
+ "watch": ["<下周值得关注的节点，1-2 条，仅可基于给定条目中已出现的线索，禁止编造>"]
+}
+规则：headlines 优先选 relevance=5 的重大发布与方向性突破；direction_summaries 只写条目数 ≥2 的方向；company_signals 只写本周确有动作的公司；所有判断只能基于给定条目归纳。`;
+
 async function narrative(items: InsightItem[]): Promise<WeeklyNarrative> {
+  const top = [...items].sort(
+    (a, b) => (b.ai_tags?.relevance ?? 3) - (a.ai_tags?.relevance ?? 3),
+  );
   const fallback: WeeklyNarrative = {
-    summary: `本周共追踪 ${items.length} 条动态，覆盖 ${groupByTrack(items).size} 个赛道、${groupByCompany(items).size} 个主体。`,
-    watch: ['（LLM 未启用，暂无预判）'],
+    tldr: [
+      `本周共追踪 ${items.length} 条高相关动态（arXiv/GitHub/官方博客）`,
+      '（LLM 未启用，本区为模板降级输出）',
+    ],
+    headlines: top.slice(0, 1).map((i) => ({ id: i.id, why: '' })),
+    direction_summaries: {},
+    company_signals: {},
+    watch: [],
   };
   if (!llmAvailable() || items.length === 0) return fallback;
   try {
-    const raw = await chat(
-      `你是 AI 行业战略分析师。基于给定的本周情报条目，输出严格 JSON（无其他文字）：
-{"summary": "<一句话概括本周行业最重要的变化，中文，50 字内>", "watch": ["<下周值得关注的节点，1-2 条，仅可基于给定条目中已出现的线索，禁止编造>"]}`,
-      compactForLlm(items, 60),
-    );
+    const payload = top.slice(0, 60).map((i) => ({
+      id: i.id,
+      company: i.company,
+      source: i.source,
+      track: i.ai_tags?.track,
+      directions: i.ai_tags?.directions ?? [],
+      relevance: i.ai_tags?.relevance ?? 3,
+      title: displayTitle(i),
+      improvement: i.ai_tags?.improvement,
+    }));
+    const raw = await chat(NARRATIVE_PROMPT, JSON.stringify(payload, null, 1));
     const parsed = parseJsonResponse<WeeklyNarrative>(raw);
-    if (parsed.summary) return { summary: parsed.summary, watch: parsed.watch?.slice(0, 2) ?? [] };
+    if (parsed.tldr?.length) {
+      return {
+        tldr: parsed.tldr.slice(0, 3),
+        headlines: (parsed.headlines ?? []).slice(0, 3),
+        direction_summaries: parsed.direction_summaries ?? {},
+        company_signals: parsed.company_signals ?? {},
+        watch: (parsed.watch ?? []).slice(0, 2),
+      };
+    }
   } catch (err) {
     console.warn('[weekly] LLM 叙事生成失败，使用模板降级:', String(err));
   }
   return fallback;
 }
 
-function hasRealImprovement(item: InsightItem): boolean {
-  const imp = item.ai_tags?.improvement ?? '';
-  return imp.length > 0 && !imp.includes('首次追踪');
+function signalMark(item: InsightItem): string {
+  const r = item.ai_tags?.relevance ?? 3;
+  if (r >= 5) return '🔥 ';
+  if (r >= 4) return '⭐ ';
+  return '';
 }
 
-/**
- * 技术迭代亮点：论文与大厂动态各占一半配额，每赛道最多 2 条。
- * arXiv 侧优先展示有真实改进点提炼的论文（PRD 核心产出），
- * 避免大厂条目独占版面导致技术演进视角缺失。
- */
-function pickHighlights(items: InsightItem[]): InsightItem[] {
-  const half = HIGHLIGHT_LIMIT / 2;
-  const perTrack = new Map<string, number>();
-  const picked: InsightItem[] = [];
-  const take = (pool: InsightItem[], quota: number) => {
-    let taken = 0;
-    for (const item of pool) {
-      if (taken >= quota) break;
-      const track = item.ai_tags?.track ?? 'other';
-      const count = perTrack.get(track) ?? 0;
-      if (count >= 2) continue;
-      perTrack.set(track, count + 1);
-      picked.push(item);
-      taken++;
-    }
-  };
-
-  const arxiv = items
-    .filter((i) => i.source === 'arxiv')
-    .sort(
-      (a, b) =>
-        Number(hasRealImprovement(b)) * 100 + (b.signal_score ?? 0) -
-        (Number(hasRealImprovement(a)) * 100 + (a.signal_score ?? 0)),
-    );
-  const corporate = items
-    .filter((i) => i.source !== 'arxiv' && i.company !== 'other')
-    .sort((a, b) => Number(hasRealImprovement(b)) - Number(hasRealImprovement(a)));
-
-  take(arxiv, half);
-  take(corporate, half);
-  // 任一侧不足时用另一侧补满
-  take([...arxiv, ...corporate].filter((i) => !picked.includes(i)), HIGHLIGHT_LIMIT - picked.length);
-  return picked;
+function itemLine(item: InsightItem): string {
+  const src = item.source === 'arxiv' ? 'arXiv' : item.source === 'github' ? 'GitHub' : '博客';
+  const who = item.company === 'other' ? src : `${src}/${companyLabel(item.company)}`;
+  const desc = item.ai_tags?.improvement ?? '';
+  return `- ${signalMark(item)}**${displayTitle(item)}**（${who}）${desc ? ` — ${desc}` : ''} [原文](${item.url})`;
 }
 
-export async function buildWeeklyReport(items: InsightItem[], runDate: Date): Promise<string> {
+/** 按主方向（directions[0]）聚类；关注方向置顶，其余按条目数降序 */
+function groupByDirection(items: InsightItem[]): Array<[string, InsightItem[]]> {
+  const map = new Map<string, InsightItem[]>();
+  for (const item of items) {
+    const dir = item.ai_tags?.directions?.[0];
+    if (!dir) continue;
+    if (!map.has(dir)) map.set(dir, []);
+    map.get(dir)!.push(item);
+  }
+  const entries = [...map.entries()];
+  entries.sort((a, b) => {
+    const fa = FOCUS_DIRECTIONS.includes(a[0]) ? 1 : 0;
+    const fb = FOCUS_DIRECTIONS.includes(b[0]) ? 1 : 0;
+    if (fa !== fb) return fb - fa;
+    return b[1].length - a[1].length;
+  });
+  return entries.slice(0, MAX_DIRECTIONS);
+}
+
+export async function buildWeeklyReport(allItems: InsightItem[], runDate: Date): Promise<string> {
   const date = ymd(runDate);
-  const { summary, watch } = await narrative(items);
+  // 相关性门槛：低价值条目（客户案例/公关文）只归档不进报告
+  const items = allItems.filter((i) => (i.ai_tags?.relevance ?? 3) >= MIN_REPORT_RELEVANCE);
+  const filtered = allItems.length - items.length;
+
+  const n = await narrative(items);
+  const byId = new Map(items.map((i) => [i.id, i]));
+  const headlineIds = new Set(n.headlines.map((h) => h.id).filter((id) => byId.has(id)));
 
   const lines: string[] = [`# AI 情报周报 | ${date}`, ''];
 
-  lines.push('## 📌 本周一句话总结', '', summary, '');
+  // 本周要点
+  lines.push('## 📌 本周要点', '');
+  for (const t of n.tldr) lines.push(`- ${t}`);
+  lines.push('');
 
-  lines.push('## 🔬 技术迭代亮点', '');
-  const highlights = pickHighlights(items);
-  if (highlights.length === 0) {
-    lines.push('本周窗口内无满足信号阈值的技术动态。', '');
-  } else {
-    for (const item of highlights) {
-      const improvement = item.ai_tags?.improvement ?? '首次追踪，暂无前序对比';
-      lines.push(`- **${trackLabel(item.ai_tags?.track)}**：${mdLink(item)} — ${improvement}`);
+  // 本周头条
+  if (headlineIds.size > 0) {
+    lines.push('## 🎯 本周头条', '');
+    for (const h of n.headlines) {
+      const item = byId.get(h.id);
+      if (!item) continue;
+      lines.push(`### ${displayTitle(item)}`, '');
+      const what = item.ai_tags?.improvement ?? '';
+      const parts: string[] = [];
+      if (what) parts.push(`**发生了什么**：${what}`);
+      if (h.why) parts.push(`**为什么重要**：${h.why}`);
+      if (parts.length > 0) lines.push(parts.join(' ｜ '));
+      lines.push(`[原文](${item.url})（${companyLabel(item.company)}）`, '');
     }
-    lines.push('');
   }
 
-  lines.push('## 🏢 大厂动态汇总', '');
+  // 研究方向雷达（头条条目不重复出现）
+  lines.push('## 🔬 研究方向雷达', '');
+  const radarItems = items.filter((i) => !headlineIds.has(i.id));
+  const directions = groupByDirection(radarItems);
+  if (directions.length === 0) {
+    lines.push('本周窗口内无满足信号阈值的方向性动态。', '');
+  } else {
+    for (const [dir, dirItems] of directions) {
+      const label = DIRECTION_LABELS.get(dir) ?? dir;
+      const focus = FOCUS_DIRECTIONS.includes(dir) ? ' 🎯' : '';
+      lines.push(`### 📡 ${label}（本周 ${dirItems.length} 条）${focus}`, '');
+      const summary = n.direction_summaries[dir];
+      if (summary) lines.push(`> ${summary}`, '');
+      const sorted = [...dirItems].sort(
+        (a, b) => (b.ai_tags?.relevance ?? 3) - (a.ai_tags?.relevance ?? 3),
+      );
+      for (const item of sorted.slice(0, MAX_ITEMS_PER_DIRECTION)) lines.push(itemLine(item));
+      lines.push('');
+    }
+  }
+
+  // 大厂动态
+  lines.push('## 🏢 大厂动态', '');
   const companyItems = groupByCompany(items.filter((i) => i.company !== 'other'));
   if (companyItems.size === 0) {
     lines.push('本周窗口内未捕获大厂公开动作。', '');
   } else {
-    lines.push('| 公司 | 本周动作 | 涉及赛道 |', '|------|----------|----------|');
+    lines.push('| 公司 | 本周战略信号 | 关键动作 |', '|------|-------------|----------|');
     for (const company of orderedCompanies(companyItems.keys())) {
-      const list = companyItems.get(company)!;
-      const actions = list
-        .slice(0, 3)
-        .map((i) => mdLink(i))
-        .join('；');
-      const extra = list.length > 3 ? ` 等 ${list.length} 项` : '';
-      const tracks = [...new Set(list.map((i) => trackLabel(i.ai_tags?.track)))].join('、');
-      lines.push(`| ${companyLabel(company)} | ${actions}${extra} | ${tracks} |`);
+      const list = [...companyItems.get(company)!].sort(
+        (a, b) => (b.ai_tags?.relevance ?? 3) - (a.ai_tags?.relevance ?? 3),
+      );
+      const signal = n.company_signals[company] ?? '—';
+      const actions = list.slice(0, 3).map((i) => mdLink(i)).join('；');
+      lines.push(`| ${companyLabel(company)} | ${signal} | ${actions} |`);
     }
     lines.push('');
   }
 
+  // 下周关注
   lines.push('## 🔭 下周关注', '');
-  for (const w of watch.length > 0 ? watch : ['暂无']) lines.push(`- ${w}`);
+  for (const w of n.watch.length > 0 ? n.watch : ['暂无']) lines.push(`- ${w}`);
   lines.push('');
 
   lines.push('---', '');
   lines.push(
-    `> 数据窗口：近 7 天 ｜ 条目数：${items.length}（arXiv ${count(items, 'arxiv')} / GitHub ${count(items, 'github')} / 博客 ${count(items, 'blog')}）｜ 由 ai-insight-dashboard 自动生成`,
+    `> 数据窗口：近 7 天 ｜ 入选 ${items.length} 条（arXiv ${count(items, 'arxiv')} / GitHub ${count(items, 'github')} / 博客 ${count(items, 'blog')}），另有 ${filtered} 条低相关条目已过滤（仅归档）｜ 由 ai-insight-dashboard 自动生成`,
     '',
   );
   return lines.join('\n');

@@ -38,9 +38,9 @@
 
 ### 运行参数（环境变量，均有默认值）
 
-`WINDOW_DAYS`（采集窗口，默认 7）、`ARXIV_LLM_LIMIT`（每周进入 LLM 分析的论文上限，默认 50）、`ARXIV_CANDIDATE_LIMIT`（粗筛候选池上限，默认 200）、`ARXIV_MAX_PAGES`（API 分页上限，默认 10）。
+`WINDOW_DAYS`（采集窗口，默认 7）、`ARXIV_LLM_LIMIT`（每周进入 LLM 分析的论文上限，默认 50）、`ARXIV_CANDIDATE_LIMIT`（粗筛候选池上限，默认 200）、`ARXIV_MAX_PAGES`（API 分页上限，默认 10）、`FOCUS_DIRECTIONS`（关注的研究方向，默认 `gui-agent,on-device,memory`，命中方向在周报置顶）、`MIN_REPORT_RELEVANCE`（进入报告的最低战略相关性 1-5，默认 3，低于阈值只归档）。
 
-监控的组织/博客/关键词清单在 [`src/config.ts`](src/config.ts) 中维护。
+监控的组织/博客/关键词/研究方向词表在 [`src/config.ts`](src/config.ts) 中维护。标签为两层体系：稳定的一级赛道（月报跨周期对比用）+ 可增删的二级研究方向（周报聚类用）。
 
 ## 本地运行
 

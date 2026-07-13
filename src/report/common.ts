@@ -36,9 +36,13 @@ export function orderedCompanies(present: Iterable<Company>): Company[] {
   return ordered;
 }
 
+/** 展示标题：优先 LLM 生成的中文短标题 */
+export function displayTitle(item: InsightItem): string {
+  return (item.ai_tags?.title_zh || item.title).replace(/[[\]|]/g, ' ').trim();
+}
+
 export function mdLink(item: InsightItem): string {
-  const title = item.title.replace(/[[\]|]/g, ' ').trim();
-  return `[${title}](${item.url})`;
+  return `[${displayTitle(item)}](${item.url})`;
 }
 
 /** 用于喂给 LLM 的紧凑条目表示 */

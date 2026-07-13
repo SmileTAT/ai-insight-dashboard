@@ -22,8 +22,15 @@ export const TRACKS = [
 export type Track = (typeof TRACKS)[number];
 
 export interface AiTags {
+  /** 一级赛道：稳定枚举，用于月报跨周期演进对比 */
   track: Track;
+  /** 二级研究方向：受控词表 slug（见 config RESEARCH_DIRECTIONS），0-2 个，周报按此聚类 */
+  directions: string[];
   keywords: string[];
+  /** 战略参考价值 1-5；低于阈值只归档不进报告（拦截客户案例/公关文） */
+  relevance: number;
+  /** LLM 生成的中文短标题（≤20 字），报告展示用 */
+  title_zh?: string;
   /** 相较前序工作的改进点；无依据时为"首次追踪，暂无前序对比" */
   improvement?: string;
 }

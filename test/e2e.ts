@@ -7,7 +7,7 @@ import assert from 'node:assert';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -77,14 +77,25 @@ const events = (org: string) =>
 const llmClassify = (userContent: string) => {
   const items = JSON.parse(userContent) as Array<{ id: string }>;
   return JSON.stringify(
-    items.map((i) => ({
-      id: i.id,
-      track: i.id.startsWith('arxiv:') ? 'foundation-model' : 'agent',
-      keywords: i.id.startsWith('arxiv:') ? ['MoE'] : ['tool use'],
-      improvement: i.id.startsWith('arxiv:2607.00001')
-        ? '以 MoE 架构超越稠密基线'
-        : '首次追踪，暂无前序对比',
-    })),
+    items.map((i) => {
+      const isArxiv = i.id.startsWith('arxiv:');
+      const isCustomerStory = i.id.includes('customer-story');
+      return {
+        id: i.id,
+        track: isArxiv ? 'foundation-model' : 'agent',
+        directions: isCustomerStory ? [] : isArxiv ? ['model-arch'] : ['gui-agent'],
+        keywords: isArxiv ? ['MoE'] : ['tool use'],
+        relevance: isCustomerStory ? 1 : i.id.startsWith('arxiv:2607.00001') ? 5 : 4,
+        title_zh: isCustomerStory
+          ? 'Acme 客户案例'
+          : isArxiv
+            ? 'MoE 架构扩展研究'
+            : 'GPT-6 相关发布',
+        improvement: i.id.startsWith('arxiv:2607.00001')
+          ? '以 MoE 架构超越稠密基线'
+          : '首次追踪，暂无前序对比',
+      };
+    }),
   );
 };
 
@@ -118,13 +129,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
   if (orgEvents) return send(JSON.stringify(events(orgEvents[1])));
   if (url.pathname === '/sitemap.xml') {
     return send(
-      `<?xml version="1.0"?><urlset><url><loc>http://127.0.0.1:${port}/news/gpt-6-announcement</loc><lastmod>${ymd}</lastmod></url></urlset>`,
+      `<?xml version="1.0"?><urlset>` +
+        `<url><loc>http://127.0.0.1:${port}/news/gpt-6-announcement</loc><lastmod>${ymd}</lastmod></url>` +
+        `<url><loc>http://127.0.0.1:${port}/news/customer-story-acme</loc><lastmod>${ymd}</lastmod></url>` +
+        `</urlset>`,
       'application/xml',
+    );
+  }
+  if (url.pathname.startsWith('/news/customer-story')) {
+    return send(
+      '<html><head><title>Acme transforms support</title><meta name="description" content="Customer case study."></head></html>',
+      'text/html',
     );
   }
   if (url.pathname.startsWith('/news/')) {
     return send(
-      '<html><head><title>Introducing GPT-6</title><meta name="description" content="Our most capable model."></head></html>',
+      '<html><head><meta property="og:title" content="Introducing GPT-6"><title>Introducing GPT-6 | Site</title><meta name="description" content="Our most capable model."></head></html>',
       'text/html',
     );
   }
@@ -144,8 +164,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         focus: { openai: '押注 Agent SDK', anthropic: '强化工具调用能力' },
       });
     } else {
+      // 周报编辑判断（头条/要点/方向小结/公司信号）
+      const items = JSON.parse(user) as Array<{ id: string }>;
+      const headline = items.find((i) => i.id.startsWith('arxiv:2607.00001'));
       content = JSON.stringify({
-        summary: '本周 Agent 工具链密集发布。',
+        tldr: ['Agent 工具链密集发布', 'MoE 架构研究升温', '大厂竞争聚焦 Agent 基础设施'],
+        headlines: headline ? [{ id: headline.id, why: 'MoE 效率突破将重塑基础模型成本结构' }] : [],
+        direction_summaries: { 'gui-agent': 'GUI Agent 工具链本周密集更新' },
+        company_signals: { openai: '发力 Agent SDK 生态', anthropic: '强化工具调用能力' },
         watch: ['OpenAI Agent SDK 后续版本'],
       });
     }
@@ -209,14 +235,25 @@ await run('run-weekly.ts');
 const weeklyFile = join(workdir, 'reports', 'weekly', `${ymd}.md`);
 assert.ok(existsSync(weeklyFile), '周报文件应存在');
 const weekly = readFileSync(weeklyFile, 'utf8');
-assert.match(weekly, /本周 Agent 工具链密集发布/, '周报应包含 LLM 一句话总结');
-assert.match(weekly, /MoE-X/, '周报应包含高信号 arXiv 论文');
+assert.match(weekly, /## 📌 本周要点/, '周报应包含要点区');
+assert.match(weekly, /Agent 工具链密集发布/, '周报应包含 LLM 要点');
+assert.match(weekly, /## 🎯 本周头条/, '周报应包含头条区');
+assert.match(weekly, /MoE 效率突破将重塑基础模型成本结构/, '头条应包含为什么重要');
 assert.match(weekly, /以 MoE 架构超越稠密基线/, '周报应包含改进点提炼');
-assert.match(weekly, /openai\/new-agent-sdk/, '周报应包含 GitHub 新仓库');
-assert.match(weekly, /Claude SDK 2\.0/, '周报应包含 Release');
-assert.match(weekly, /Introducing GPT-6/, '周报应包含博客文章');
+assert.match(weekly, /## 🔬 研究方向雷达/, '周报应包含研究方向雷达');
+assert.match(weekly, /GUI Agent 与计算机使用（本周 \d+ 条） 🎯/, '关注方向应有 🎯 标记');
+assert.match(weekly, /GUI Agent 工具链本周密集更新/, '方向小结应渲染');
+assert.match(weekly, /MoE 架构扩展研究/, '应展示中文短标题');
+assert.match(weekly, /发力 Agent SDK 生态/, '大厂表应包含战略信号');
 assert.match(weekly, /OpenAI Agent SDK 后续版本/, '周报应包含下周关注');
 assert.ok(!weekly.includes('Homology'), '零信号论文应被一级漏斗过滤');
+assert.ok(!weekly.includes('Acme'), '低相关客户案例应被相关性门槛过滤出报告');
+
+// 被过滤的低相关条目必须仍在归档中（只滤报告，不丢数据）
+const year = ymd.slice(0, 4);
+const weekDir = readdirSync(join(workdir, 'data', year))[0];
+const archiveJson = readFileSync(join(workdir, 'data', year, weekDir, 'items.json'), 'utf8');
+assert.match(archiveJson, /customer-story-acme/, '低相关条目应保留在归档中');
 
 const archiveFiles = readFileSync(join(workdir, 'state.json'), 'utf8');
 assert.match(archiveFiles, /github:repo:openai\/new-agent-sdk/, 'state 应记录已见 GitHub 条目');
@@ -232,7 +269,7 @@ assert.ok(existsSync(monthlyFile), '月报文件应存在');
 const monthly = readFileSync(monthlyFile, 'utf8');
 assert.match(monthly, /本月 Agent 赛道显著升温/, '月报应包含综述');
 assert.match(monthly, /押注 Agent SDK/, '月报应包含战略重心判断');
-assert.match(monthly, /MoE-X/, '月报应聚合周归档数据');
+assert.match(monthly, /MoE 架构扩展研究/, '月报应聚合周归档数据（中文短标题）');
 assert.match(monthly, /下月看点预判/, '月报应包含预判章节');
 
 server.close();

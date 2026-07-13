@@ -1,4 +1,5 @@
 import type { InsightItem, Track } from '../types.js';
+import { MIN_REPORT_RELEVANCE } from '../config.js';
 import { chat, llmAvailable, parseJsonResponse } from '../analysis/llm.js';
 import {
   companyLabel,
@@ -87,7 +88,9 @@ function trackTimeline(track: Track, items: InsightItem[]): string[] {
   return lines;
 }
 
-export async function buildMonthlyReport(month: string, items: InsightItem[]): Promise<string> {
+export async function buildMonthlyReport(month: string, allItems: InsightItem[]): Promise<string> {
+  // 与周报同一道相关性门槛；历史归档缺 relevance 字段时默认放行
+  const items = allItems.filter((i) => (i.ai_tags?.relevance ?? 3) >= MIN_REPORT_RELEVANCE);
   const { overview, verdict, outlook, focus } = await narrative(month, items);
 
   const lines: string[] = [`# AI 情报月报 | ${month}`, ''];
