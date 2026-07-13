@@ -1,0 +1,25 @@
+{
+  "name": "ai-insight-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "战略级 AI 情报系统：自动追踪技术路线图演进与大厂竞争格局，产出周报/月报",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "weekly": "tsx src/run-weekly.ts",
+    "monthly": "tsx src/run-monthly.ts",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "tsx test/e2e.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.5.0",
+    "undici": "^8.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
