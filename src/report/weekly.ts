@@ -1,18 +1,13 @@
 import type { InsightItem } from '../types.js';
 import {
+  COMPANY_ORDER,
   FOCUS_DIRECTIONS,
   MIN_REPORT_RELEVANCE,
   RESEARCH_DIRECTIONS,
 } from '../config.js';
 import { chat, llmAvailable, parseJsonResponse } from '../analysis/llm.js';
 import { ymd } from '../util/dates.js';
-import {
-  companyLabel,
-  displayTitle,
-  groupByCompany,
-  mdLink,
-  orderedCompanies,
-} from './common.js';
+import { companyLabel, displayTitle, groupByCompany, mdLink } from './common.js';
 
 const MAX_DIRECTIONS = 6;
 const MAX_ITEMS_PER_DIRECTION = 4;
@@ -31,7 +26,7 @@ interface WeeklyNarrative {
 const NARRATIVE_PROMPT = `你是 AI 行业战略分析师，为技术决策者撰写周报的编辑判断部分。基于给定的本周情报条目（已含赛道 track、研究方向 directions、相关性 relevance），输出严格 JSON（无其他文字、无代码围栏）：
 {
  "tldr": ["<本周要点，3 条，每条 ≤40 字，覆盖最重要的变化>"],
- "headlines": [{"id": "<从输入中选出本周最重要的 1-3 条的 id>", "why": "<为什么重要：对行业格局/技术路线的影响判断，一句话>"}],
+ "headlines": [{"id": "<从输入中选出本周最重要的 1-3 条的 id>", "why": "<为什么重要：对行业格局/技术路线/竞争态势的影响判断，一句话。禁止复述条目本身做了什么（improvement 字段已有），必须给出增量判断，如'谁受影响、改变什么趋势、和谁形成竞争'>"}],
  "direction_summaries": {"<direction id>": "<该方向本周小结：发生了什么、往哪个方向演进，一句话>"},
  "company_signals": {"<company>": "<该公司本周战略信号的一句话判断，如'以客户案例为 DevDay 造势'>"},
  "watch": ["<下周值得关注的节点，1-2 条，仅可基于给定条目中已出现的线索，禁止编造>"]
@@ -143,7 +138,13 @@ export async function buildWeeklyReport(allItems: InsightItem[], runDate: Date):
       if (what) parts.push(`**发生了什么**：${what}`);
       if (h.why) parts.push(`**为什么重要**：${h.why}`);
       if (parts.length > 0) lines.push(parts.join(' ｜ '));
-      lines.push(`[原文](${item.url})（${companyLabel(item.company)}）`, '');
+      const src =
+        item.company === 'other'
+          ? item.source === 'arxiv'
+            ? 'arXiv'
+            : item.source
+          : companyLabel(item.company);
+      lines.push(`[原文](${item.url})（${src}）`, '');
     }
   }
 
@@ -151,6 +152,15 @@ export async function buildWeeklyReport(allItems: InsightItem[], runDate: Date):
   lines.push('## 🔬 研究方向雷达', '');
   const radarItems = items.filter((i) => !headlineIds.has(i.id));
   const directions = groupByDirection(radarItems);
+  // 关注方向本周无信号时显式提示，避免读者误以为漏采
+  const activeDirs = new Set(directions.map(([d]) => d));
+  const quietFocus = FOCUS_DIRECTIONS.filter((d) => !activeDirs.has(d));
+  if (quietFocus.length > 0) {
+    lines.push(
+      `> ℹ️ 关注方向本周无高信号动态：${quietFocus.map((d) => DIRECTION_LABELS.get(d) ?? d).join('、')}`,
+      '',
+    );
+  }
   if (directions.length === 0) {
     lines.push('本周窗口内无满足信号阈值的方向性动态。', '');
   } else {
@@ -175,10 +185,15 @@ export async function buildWeeklyReport(allItems: InsightItem[], runDate: Date):
     lines.push('本周窗口内未捕获大厂公开动作。', '');
   } else {
     lines.push('| 公司 | 本周战略信号 | 关键动作 |', '|------|-------------|----------|');
-    for (const company of orderedCompanies(companyItems.keys())) {
-      const list = [...companyItems.get(company)!].sort(
+    // 监控名单内的公司全部列出：无高信号动作也显式说明，与"漏采"区分
+    for (const company of COMPANY_ORDER) {
+      const list = [...(companyItems.get(company) ?? [])].sort(
         (a, b) => (b.ai_tags?.relevance ?? 3) - (a.ai_tags?.relevance ?? 3),
       );
+      if (list.length === 0) {
+        lines.push(`| ${companyLabel(company)} | 本周无高信号公开动作 | — |`);
+        continue;
+      }
       const signal = n.company_signals[company] ?? '—';
       const actions = list.slice(0, 3).map((i) => mdLink(i)).join('；');
       lines.push(`| ${companyLabel(company)} | ${signal} | ${actions} |`);
