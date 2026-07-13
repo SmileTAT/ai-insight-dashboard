@@ -38,23 +38,48 @@ async function narrative(items: InsightItem[]): Promise<WeeklyNarrative> {
   return fallback;
 }
 
-/** 技术迭代亮点：每赛道最多 2 条，优先大厂发布与高分论文 */
+function hasRealImprovement(item: InsightItem): boolean {
+  const imp = item.ai_tags?.improvement ?? '';
+  return imp.length > 0 && !imp.includes('首次追踪');
+}
+
+/**
+ * 技术迭代亮点：论文与大厂动态各占一半配额，每赛道最多 2 条。
+ * arXiv 侧优先展示有真实改进点提炼的论文（PRD 核心产出），
+ * 避免大厂条目独占版面导致技术演进视角缺失。
+ */
 function pickHighlights(items: InsightItem[]): InsightItem[] {
-  const scored = [...items].sort((a, b) => {
-    const pa = (a.company !== 'other' ? 100 : 0) + (a.signal_score ?? 0);
-    const pb = (b.company !== 'other' ? 100 : 0) + (b.signal_score ?? 0);
-    return pb - pa;
-  });
+  const half = HIGHLIGHT_LIMIT / 2;
   const perTrack = new Map<string, number>();
   const picked: InsightItem[] = [];
-  for (const item of scored) {
-    const track = item.ai_tags?.track ?? 'other';
-    const count = perTrack.get(track) ?? 0;
-    if (count >= 2) continue;
-    perTrack.set(track, count + 1);
-    picked.push(item);
-    if (picked.length >= HIGHLIGHT_LIMIT) break;
-  }
+  const take = (pool: InsightItem[], quota: number) => {
+    let taken = 0;
+    for (const item of pool) {
+      if (taken >= quota) break;
+      const track = item.ai_tags?.track ?? 'other';
+      const count = perTrack.get(track) ?? 0;
+      if (count >= 2) continue;
+      perTrack.set(track, count + 1);
+      picked.push(item);
+      taken++;
+    }
+  };
+
+  const arxiv = items
+    .filter((i) => i.source === 'arxiv')
+    .sort(
+      (a, b) =>
+        Number(hasRealImprovement(b)) * 100 + (b.signal_score ?? 0) -
+        (Number(hasRealImprovement(a)) * 100 + (a.signal_score ?? 0)),
+    );
+  const corporate = items
+    .filter((i) => i.source !== 'arxiv' && i.company !== 'other')
+    .sort((a, b) => Number(hasRealImprovement(b)) - Number(hasRealImprovement(a)));
+
+  take(arxiv, half);
+  take(corporate, half);
+  // 任一侧不足时用另一侧补满
+  take([...arxiv, ...corporate].filter((i) => !picked.includes(i)), HIGHLIGHT_LIMIT - picked.length);
   return picked;
 }
 
