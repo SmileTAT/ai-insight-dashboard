@@ -7,7 +7,8 @@ import { previousMonth } from './util/dates.js';
 
 async function main(): Promise<void> {
   // 每月 1 日运行，覆盖上一个自然月；可用 REPORT_MONTH=YYYY-MM 手动补跑任意月份
-  const month = process.env.REPORT_MONTH ?? previousMonth();
+  // （定时触发时 CI 注入的 inputs 为空字符串，须用 || 兜底）
+  const month = process.env.REPORT_MONTH || previousMonth();
   if (!/^\d{4}-\d{2}$/.test(month)) throw new Error(`REPORT_MONTH 格式应为 YYYY-MM，得到：${month}`);
 
   const items = loadItemsForMonth(month);

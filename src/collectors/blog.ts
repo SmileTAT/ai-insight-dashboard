@@ -53,7 +53,9 @@ async function fetchSitemapUrls(url: string, depth = 0): Promise<SitemapUrl[]> {
 async function fetchPageMeta(url: string): Promise<{ title: string; description: string }> {
   try {
     const html = await fetchText(url);
-    const title = html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim() ?? '';
+    const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? '')
+      .replace(/\s*[\\|–—-]\s*(OpenAI|Anthropic|Google DeepMind)\s*$/i, '')
+      .trim();
     const description =
       html
         .match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1]

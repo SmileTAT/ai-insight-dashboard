@@ -1,24 +1,24 @@
 import { readFileSync } from 'node:fs';
 import type { BlogSourceConfig, OrgConfig, Track } from './types.js';
 
-/** 采集窗口（天） */
-export const WINDOW_DAYS = Number(process.env.WINDOW_DAYS ?? 7);
+/** 采集窗口（天）。数值型环境变量统一用 || 兜底，空字符串视为未设置 */
+export const WINDOW_DAYS = Number(process.env.WINDOW_DAYS || 7);
 
 /** API 端点可通过环境变量覆盖（镜像站/测试用） */
 export const ARXIV_API_BASE =
-  process.env.ARXIV_API_BASE ?? 'https://export.arxiv.org/api/query';
-export const GITHUB_API_BASE = process.env.GITHUB_API_BASE ?? 'https://api.github.com';
+  process.env.ARXIV_API_BASE || 'https://export.arxiv.org/api/query';
+export const GITHUB_API_BASE = process.env.GITHUB_API_BASE || 'https://api.github.com';
 
 export const ARXIV_CATEGORIES = ['cs.AI', 'cs.LG', 'cs.CL'];
 
 /** 每周进入 LLM 完整分析的 arXiv 论文上限（PRD 5.2 二级漏斗限额 N） */
-export const ARXIV_LLM_LIMIT = Number(process.env.ARXIV_LLM_LIMIT ?? 50);
+export const ARXIV_LLM_LIMIT = Number(process.env.ARXIV_LLM_LIMIT || 50);
 
 /** 规则粗筛后保留的候选池上限（其余不入档） */
-export const ARXIV_CANDIDATE_LIMIT = Number(process.env.ARXIV_CANDIDATE_LIMIT ?? 200);
+export const ARXIV_CANDIDATE_LIMIT = Number(process.env.ARXIV_CANDIDATE_LIMIT || 200);
 
 /** arXiv API 分页上限（每页 200 条） */
-export const ARXIV_MAX_PAGES = Number(process.env.ARXIV_MAX_PAGES ?? 10);
+export const ARXIV_MAX_PAGES = Number(process.env.ARXIV_MAX_PAGES || 10);
 
 /** PRD 4.1 监控目标组织清单 */
 export const GITHUB_ORGS: OrgConfig[] = [

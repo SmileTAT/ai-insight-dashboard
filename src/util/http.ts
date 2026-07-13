@@ -21,6 +21,10 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}): Promi
       if (res.ok || (res.status < 500 && res.status !== 429)) return res;
       lastError = new Error(`HTTP ${res.status} for ${url}`);
     } catch (err) {
+      // URL 本身非法属于配置错误，重试无意义
+      if (err instanceof TypeError && String(err.message).includes('Failed to parse URL')) {
+        throw err;
+      }
       lastError = err;
     }
     if (attempt < BACKOFF_MS.length) {

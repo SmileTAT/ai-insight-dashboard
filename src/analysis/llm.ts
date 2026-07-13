@@ -8,9 +8,10 @@ import { fetchWithRetry } from '../util/http.js';
  *   LLM_MODEL        - 周报/批量归类用的低成本模型
  *   LLM_STRONG_MODEL - 月报综述用的强模型（缺省回落到 LLM_MODEL）
  */
-const BASE_URL = (process.env.LLM_BASE_URL ?? 'https://api.deepseek.com/v1').replace(/\/$/, '');
-const MODEL = process.env.LLM_MODEL ?? 'deepseek-chat';
-const STRONG_MODEL = process.env.LLM_STRONG_MODEL ?? MODEL;
+// 注意用 || 而非 ??：CI 中 `${{ vars.X }}` 未配置时注入的是空字符串而非 undefined
+const BASE_URL = (process.env.LLM_BASE_URL || 'https://api.deepseek.com/v1').replace(/\/$/, '');
+const MODEL = process.env.LLM_MODEL || 'deepseek-chat';
+const STRONG_MODEL = process.env.LLM_STRONG_MODEL || MODEL;
 
 const usage = { requests: 0, total_tokens: 0 };
 
