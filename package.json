@@ -5,7 +5,7 @@
   "type": "module",
   "description": "战略级 AI 情报系统：自动追踪技术路线图演进与大厂竞争格局，产出周报/月报",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.19"
   },
   "scripts": {
     "weekly": "tsx src/run-weekly.ts",
