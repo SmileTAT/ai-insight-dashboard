@@ -77,8 +77,17 @@ export interface DirectionDef {
 }
 
 export const RESEARCH_DIRECTIONS: DirectionDef[] = [
+  // Agent 细分方向（越具体越靠前：启发式回退取首个命中作为主方向）
   { id: 'gui-agent', label: 'GUI Agent 与计算机使用', hint: 'GUI/浏览器/操作系统自动化 agent、computer use', pattern: /gui.?agent|computer.?use|browser.?(agent|automation)|web.?agent|screen(shot)? understanding|os.?agent/i },
   { id: 'code-agent', label: '编码 Agent', hint: '代码生成、SWE agent、软件工程自动化', pattern: /cod(e|ing).?(agent|gen)|swe-?bench|software engineer|program (synthesis|repair)/i },
+  { id: 'tool-mcp', label: '工具调用与 MCP 协议', hint: '工具调用、function calling、MCP/A2A 等 agent 互操作协议', pattern: /tool.?(use|call|learn|integrat)|function.?call|\bmcp\b|model context protocol|\ba2a\b|agent.?protocol/i },
+  { id: 'deep-research', label: 'Deep Research 型 Agent', hint: '搜索/研究型 agent、多步信息检索与综述生成', pattern: /deep.?research|research agent|search agent|multi.?hop (search|retrieval)|information.?seeking agent/i },
+  { id: 'voice-agent', label: '语音与实时交互 Agent', hint: '语音 agent、实时对话、全双工交互', pattern: /voice (agent|assistant)|speech.?to.?speech|real.?time (voice|speech|conversation)|full.?duplex|spoken dialog/i },
+  { id: 'agent-planning', label: '规划与长程任务', hint: '任务分解、long-horizon 执行、反思纠错', pattern: /task decomposit|long.?horizon|plan(ning|ner).{0,30}agent|agent.{0,30}plan(ning|ner)|reflexion|self.?correct/i },
+  { id: 'agentic-rl', label: 'Agentic RL 训练', hint: '用强化学习端到端训练 agent（区别于通用 RLHF 对齐）', pattern: /agentic (rl|reinforcement)|reinforcement.{0,30}(train|learn).{0,30}agent|agent.{0,30}reinforcement learning|rl.{0,20}(fine.?tun|train).{0,20}agent/i },
+  { id: 'agent-self-improve', label: 'Agent 自我进化', hint: '自我改进、经验积累与复用、技能库、终身学习', pattern: /self.?improv|self.?evol|experience (replay|learning|reuse)|skill (library|acquisition)|lifelong learning/i },
+  { id: 'agent-security', label: 'Agent 安全', hint: '提示注入、工具投毒、权限控制、沙箱隔离（区别于通用对齐）', pattern: /prompt injection|indirect injection|tool poison|agent.{0,30}(security|hijack|privilege)|sandbox|permission (control|model)/i },
+  { id: 'agent-runtime', label: 'Agent 运行时与编排', hint: 'agent 框架、运行时、多 agent 编排基础设施', pattern: /agent (framework|runtime|orchestrat|sdk)|orchestrat.{0,20}agent|langchain|autogen|crewai/i },
   { id: 'agent-reliability', label: 'Agent 评测与可靠性', hint: 'agent 基准、失败分析、鲁棒性', pattern: /agent\w*.{0,40}(bench|eval|fail|robust|reliab)|(bench|eval)\w*.{0,40}agent/i },
   { id: 'multi-agent', label: '多智能体协作', hint: '多 agent 系统、协作、群体智能', pattern: /multi-?agent|agent (collaborat|swarm|societ)/i },
   { id: 'memory', label: '记忆与个性化', hint: '长期记忆系统、个性化、用户建模', pattern: /memor(y|ies)|personaliz|user (profil|model)/i },
@@ -94,8 +103,11 @@ export const RESEARCH_DIRECTIONS: DirectionDef[] = [
   { id: 'infra-efficiency', label: '训练与推理效率', hint: '推理优化、量化、蒸馏、训练效率', pattern: /inference (optim|serv)|quantiz|distill|kv.?cache|throughput|training efficien/i },
 ];
 
-/** 用户关注方向：命中时在周报中置顶并标记（逗号分隔的 direction id） */
-export const FOCUS_DIRECTIONS = (process.env.FOCUS_DIRECTIONS || 'gui-agent,on-device,memory')
+/** 用户关注方向：命中时在周报中置顶并标记（逗号分隔的 direction id）。默认聚焦 Agent 全家桶 + 记忆 */
+export const FOCUS_DIRECTIONS = (
+  process.env.FOCUS_DIRECTIONS ||
+  'gui-agent,code-agent,tool-mcp,deep-research,voice-agent,agent-planning,agentic-rl,agent-self-improve,agent-security,agent-runtime,agent-reliability,multi-agent,memory'
+)
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
@@ -115,6 +127,18 @@ export const ARXIV_PREFILTER_KEYWORDS: Array<{ term: string; weight: number }> =
   { term: 'gui agent', weight: 3 },
   { term: 'computer use', weight: 3 },
   { term: 'web agent', weight: 3 },
+  { term: 'model context protocol', weight: 3 },
+  { term: 'function calling', weight: 2 },
+  { term: 'deep research', weight: 3 },
+  { term: 'research agent', weight: 3 },
+  { term: 'voice agent', weight: 3 },
+  { term: 'full-duplex', weight: 2 },
+  { term: 'long-horizon', weight: 2 },
+  { term: 'task decomposition', weight: 2 },
+  { term: 'agentic reinforcement', weight: 3 },
+  { term: 'prompt injection', weight: 2 },
+  { term: 'skill library', weight: 2 },
+  { term: 'agent framework', weight: 2 },
   { term: 'on-device', weight: 3 },
   { term: 'edge deployment', weight: 2 },
   { term: 'small language model', weight: 2 },

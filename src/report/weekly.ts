@@ -9,7 +9,7 @@ import { chat, llmAvailable, parseJsonResponse } from '../analysis/llm.js';
 import { ymd } from '../util/dates.js';
 import { companyLabel, displayTitle, groupByCompany, mdLink } from './common.js';
 
-const MAX_DIRECTIONS = 6;
+const MAX_DIRECTIONS = 8;
 const MAX_ITEMS_PER_DIRECTION = 4;
 
 const DIRECTION_LABELS = new Map(RESEARCH_DIRECTIONS.map((d) => [d.id, d.label]));
@@ -156,10 +156,9 @@ export async function buildWeeklyReport(allItems: InsightItem[], runDate: Date):
   const activeDirs = new Set(directions.map(([d]) => d));
   const quietFocus = FOCUS_DIRECTIONS.filter((d) => !activeDirs.has(d));
   if (quietFocus.length > 0) {
-    lines.push(
-      `> ℹ️ 关注方向本周无高信号动态：${quietFocus.map((d) => DIRECTION_LABELS.get(d) ?? d).join('、')}`,
-      '',
-    );
+    const shown = quietFocus.slice(0, 6).map((d) => DIRECTION_LABELS.get(d) ?? d);
+    const more = quietFocus.length > shown.length ? ` 等 ${quietFocus.length} 个` : '';
+    lines.push(`> ℹ️ 关注方向本周无高信号动态：${shown.join('、')}${more}`, '');
   }
   if (directions.length === 0) {
     lines.push('本周窗口内无满足信号阈值的方向性动态。', '');
