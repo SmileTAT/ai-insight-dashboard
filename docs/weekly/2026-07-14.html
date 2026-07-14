@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 情报周报 | 2026-07-14</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1a1a1a;--muted:#6b6b6b;--card:#ffffff;--line:#e6e3dd;--accent:#b45309;--accent-soft:#fef3e2;--quote:#f5f1ea;--link:#0f5ea8}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--fg:#e8e6e1;--muted:#9a988f;--card:#1e1e1c;--line:#33312c;--accent:#f59e0b;--accent-soft:#2a2010;--quote:#232019;--link:#7db8e8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:.7rem 1rem;display:flex;gap:1.2rem;align-items:baseline;z-index:9}
+nav .brand{font-weight:700;color:var(--fg);text-decoration:none}
+nav a{color:var(--muted);text-decoration:none;font-size:.9rem}
+nav a:hover{color:var(--accent)}
+main{max-width:46rem;margin:0 auto;padding:1.5rem 1.2rem 4rem}
+h1{font-size:1.7rem;line-height:1.35;margin:1rem 0 .4rem}
+h2{font-size:1.25rem;margin:2.2rem 0 .8rem;padding-bottom:.35rem;border-bottom:2px solid var(--line)}
+h3{font-size:1.05rem;margin:1.4rem 0 .5rem}
+a{color:var(--link)}
+ul{padding-left:1.2rem;margin:.4rem 0}
+li{margin:.45rem 0}
+blockquote{margin:.8rem 0;padding:.7rem 1rem;background:var(--quote);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--fg)}
+blockquote p{margin:.2rem 0}
+hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.table-wrap{overflow-x:auto;margin:.8rem 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);white-space:nowrap}
+.issue-list{list-style:none;padding:0}
+.issue-list li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1.1rem;margin:.6rem 0}
+.issue-list a{font-weight:600;text-decoration:none}
+.issue-list .meta{color:var(--muted);font-size:.85rem;margin-left:.6rem}
+footer{color:var(--muted);font-size:.85rem;text-align:center;padding:2rem 0}
+</style>
+</head>
+<body>
+<nav><a class="brand" href="../index.html">AI 情报周刊</a><a href="../index.html">往期</a></nav>
+<main>
+<h1>AI 情报周报 | 2026-07-14</h1>
+<blockquote>
+<p>第 1 期 ｜ 预计阅读 10 分钟</p>
+</blockquote>
+<h2>📌 本周要点</h2>
+<ul>
+<li>G-Frame 7B模型降79%幻觉匹敌GPT-4o mini，小模型逆袭大模型。</li>
+<li>Anthropic发布Claude Sonnet 5，自称最强agent编程模型。</li>
+<li>小米38B世界模型U0，首个多机器人多视图场景生成。</li>
+</ul>
+<h2>💬 编辑观察</h2>
+<blockquote>
+<p>本周Agent领域RL进展密集，但市场明显高估了模型参数竞赛，低估了多智能体框架和安全性。Anthropic一边发布安全红队报告、放大特征操控研究，一边高调推出Sonnet 5，暴露出其在安全与商业化之间摇摆的真实意图。小米世界模型U0被多数人忽略，但从具身智能视角看，它标志着中国大厂正式切入基础世界模型战场，这可能是本周最大的战略信号。另外，量化LLM可靠性缩放定律论文提醒行业：压缩模型性能保留，但可靠性未必——这对模型部署的风险评估至关重要，但很少被讨论。</p>
+</blockquote>
+<h2>🎯 本周头条</h2>
+<h3>Claude Sonnet 5发布：最强agent能力的编程模型</h3>
+<p><strong>发生了什么</strong>：Anthropic发布Claude Sonnet 5，宣称具备最强agent能力的编程模型，直接对标GitHub Copilot等编码助手。</p>
+<p><strong>怎么做到的</strong>：通过增强agent能力和编程智能实现性能提升。</p>
+<p><strong>为什么重要</strong>：标志Anthropic正式切入编程Agent赛道，与OpenAI、微软形成竞争，其安全特色可能成为差异化优势。</p>
+<p><a href="https://www.anthropic.com/news/claude-sonnet-5" target="_blank" rel="noopener">原文</a>（Anthropic）</p>
+<h3>小米发布38B参数量世界模型U0，首个多机器人多视图场景生成</h3>
+<p><strong>发生了什么</strong>：小米发布38B参数世界模型U0，首次支持多机器人、多视图场景统一生成。</p>
+<p><strong>怎么做到的</strong>：采用统一多任务具身生成框架，保留预训练泛化性并适应具身场景。</p>
+<p><strong>为什么重要</strong>：小米正式进入具身智能基础模型战场，与小鹏、特斯拉等玩家竞争，世界模型正成为下一代具身大脑的通用入口。</p>
+<p><a href="https://arxiv.org/abs/2607.11643" target="_blank" rel="noopener">原文</a>（arXiv）</p>
+<h3>G-Frame 博弈多智能体框架降79%幻觉，7B模型匹敌GPT-4o mini</h3>
+<p><strong>发生了什么</strong>：G-Frame博弈多智能体框架使7B模型幻觉降低79%，性能匹敌GPT-4o mini。</p>
+<p><strong>怎么做到的</strong>：首次将贝叶斯-团队博弈用于自动合成领域数据，大幅优化小模型能力。</p>
+<p><strong>为什么重要</strong>：验证小模型+智能框架可逼近大模型，将降低Agent部署成本，对LLMaaS商业模式构成挑战。</p>
+<p><a href="https://arxiv.org/abs/2607.08403" target="_blank" rel="noopener">原文</a>（arXiv）</p>
+<h2>🔬 研究方向雷达</h2>
+<blockquote>
+<p>ℹ️ 关注方向本周无高信号动态：编码 Agent、工具调用与 MCP 协议、Deep Research 型 Agent、语音与实时交互 Agent、Agent 自我进化</p>
+</blockquote>
+<h3>📡 多智能体协作（本周 5 条） 🎯</h3>
+<blockquote>
+<p>G-Frame、MASTE、Eluna等证明多Agent协作在幻觉抑制、可靠性、任务分解上效果突出。</p>
+</blockquote>
+<ul>
+<li><strong>ToMap 多智能体框架聚焦分解器瓶颈，优化测试时计算</strong>（arXiv） — 让自动形式化证明更高效，避免大量无引导尝试 <a href="https://arxiv.org/abs/2607.11307" target="_blank" rel="noopener">原文</a></li>
+<li><strong>Eluna：图引导多Agent蒸馏实现仓库SOP执行94%专家一致性</strong>（arXiv） — 让LLM在严格规程仓库环境中自动可靠地执行多系统操作 <a href="https://arxiv.org/abs/2607.08960" target="_blank" rel="noopener">原文</a></li>
+<li><strong>KV-PRM: Efficient Process Reward Modeling via KV-Cache Transfer for Multi-Agent Test-Time Scaling</strong>（arXiv） — 首次追踪，暂无前序对比 <a href="https://arxiv.org/abs/2607.09153" target="_blank" rel="noopener">原文</a></li>
+<li><strong>MASTE 多Agent流式抽取情感三元组，零样本可用</strong>（arXiv） — 多Agent协作分解复杂NLP任务，无需训练即能零样本抽取情感三元组 <a href="https://arxiv.org/abs/2607.08080" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 GUI Agent 与计算机使用（本周 4 条） 🎯</h3>
+<blockquote>
+<p>UNIBROWSE、SCALECUA等推动GUI agent从单任务向多模态、可规模化RL训练演进。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>UNIBROWSE 首套全模式浏览数据管道，训练35B agent达SOTA</strong>（arXiv） — 为浏览器 agent 提供高质量训练数据，大幅提升多模态浏览能力 <a href="https://arxiv.org/abs/2607.10557" target="_blank" rel="noopener">原文</a></li>
+<li><strong>StructAgent: Harness Long-horizon Digital Agents with Unified Causal Structure</strong>（arXiv） — 首次追踪，暂无前序对比 <a href="https://arxiv.org/abs/2607.11388" target="_blank" rel="noopener">原文</a></li>
+<li><strong>SCALECUA: Scaling Computer Use Agents with Verifiable Task Synthesis and Efficient Online RL</strong>（arXiv） — 首次追踪，暂无前序对比 <a href="https://arxiv.org/abs/2607.11185" target="_blank" rel="noopener">原文</a></li>
+<li><strong>MAG: 首个统一动作与指南生成的多模态 Web Agent 基准</strong>（arXiv） — 新基准让 Web Agent 既操作界面又能生成操作指引 <a href="https://arxiv.org/abs/2607.10079" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Agent 安全（本周 4 条） 🎯</h3>
+<blockquote>
+<p>Prismata、NetInjectBench等提出无标注动态信任和元数据防御，Agent安全防御从理论走向实践。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>Prismata：上下文最小权限防御web agent跨站提示注入</strong>（arXiv） — 让web agent在浏览未知网站时不被恶意内容劫持 <a href="https://arxiv.org/abs/2607.08147" target="_blank" rel="noopener">原文</a></li>
+<li><strong>NetInjectBench 首套网络运维 agent 注入基准，元数据防御达100%</strong>（arXiv） — 为网络运维 agent 提供有效防御注入攻击的方案 <a href="https://arxiv.org/abs/2607.10490" target="_blank" rel="noopener">原文</a></li>
+<li><strong>AcMAS 利用激活空间检测多Agent系统隐形恶意行为</strong>（arXiv） — 通过分析Agent内部推理激活状态，即使隐蔽攻击也能被检测 <a href="https://arxiv.org/abs/2607.06807" target="_blank" rel="noopener">原文</a></li>
+<li><strong>制度红队首次量化部署规则对多智能体安全的影响：规则改变可致死亡率波动 22-58 个百分点</strong>（arXiv） — 多智能体安全不仅取决于模型，更取决于部署规则设计 <a href="https://arxiv.org/abs/2607.07695" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 规划与长程任务（本周 4 条） 🎯</h3>
+<blockquote>
+<p>GATS实现100%规划成功率零LLM调用，FSD-VLN解耦语义与动作，规划向分层与高效演进。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>GATS: 分层世界模型加图搜索实现 100%规划成功率且零 LLM 调用</strong>（arXiv） — 用世界模型替代 LLM 做规划，更快、更稳、零推理成本 <a href="https://arxiv.org/abs/2607.08894" target="_blank" rel="noopener">原文</a></li>
+<li><strong>FSD-VLN双系统解耦语义与动作，长程无人机导航减少抖动</strong>（arXiv） — 让无人机通过语言指令进行更平滑的长距离自主导航 <a href="https://arxiv.org/abs/2607.08359" target="_blank" rel="noopener">原文</a></li>
+<li><strong>ARCANA: 多智能体协作反思框架为 ARC-AGI-2 实现高效程序合成</strong>（arXiv） — 多个智能体分工感知、假设、执行与反思，提升抽象推理效率 <a href="https://arxiv.org/abs/2607.09059" target="_blank" rel="noopener">原文</a></li>
+<li><strong>低成本 Agent 框架在 ARC-AGI-1 上达 67.25% pass@2，每任务仅需 0.62 美元</strong>（arXiv） — 通过分解探索与合成步骤，轻量方法也能在抽象推理上高效获胜 <a href="https://arxiv.org/abs/2607.06764" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Agentic RL 训练（本周 3 条） 🎯</h3>
+<blockquote>
+<p>SAO、EPPO等方法解决多任务探索节奏与训练稳定性，RL正成为Agent能力提升的核心引擎。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>SAO 用单 rollout 异步优化让 agentic RL 稳定训练千步</strong>（arXiv） — 让长任务 agent 的强化学习训练更稳定高效 <a href="https://arxiv.org/abs/2607.07508" target="_blank" rel="noopener">原文</a></li>
+<li>⭐ <strong>EPPO 解决多任务Agent RL中任务间探索节奏不匹配问题</strong>（arXiv） — 让同时学习多个任务的LLM Agent避免任务间互相干扰，训练更稳定 <a href="https://arxiv.org/abs/2607.07178" target="_blank" rel="noopener">原文</a></li>
+<li><strong>AWM：世界模型充当对手，自博弈微调提升运动规划鲁棒性</strong>（arXiv） — 让自动驾驶通过自我对抗学会应对密集交通中的罕见危险场景 <a href="https://arxiv.org/abs/2607.10630" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 记忆与个性化（本周 3 条） 🎯</h3>
+<blockquote>
+<p>ABot-AgentOS、Vinci2、率失真统一视角等推动记忆从KV缓存到终身多模态结构化演进。</p>
+</blockquote>
+<ul>
+<li><strong>LongMedBench 首个真实EHR长期临床决策基准，多轮交互评测</strong>（arXiv） — 为医疗大模型在真实长期诊疗场景中的表现提供可靠评测 <a href="https://arxiv.org/abs/2607.09322" target="_blank" rel="noopener">原文</a></li>
+<li><strong>认知结构多模态Agent：外化视觉记忆实现长程多模态对话</strong>（arXiv） — 让AI在长对话中记住并回忆相关视觉信息，更好理解生成多模态内容 <a href="https://arxiv.org/abs/2607.08497" target="_blank" rel="noopener">原文</a></li>
+<li><strong>率失真视角统一 LLM 与 Agent 记忆压缩：七轴分类法揭示注意力机制是所有层的共同决策信号</strong>（arXiv） — 所有记忆压缩问题本质都是率失真权衡，可统一处理 <a href="https://arxiv.org/abs/2607.08032" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Agent 评测与可靠性（本周 3 条） 🎯</h3>
+<blockquote>
+<p>UniClawBench、LongMedBench、AgentLocate等基准和故障定位工具加速Agent可靠性工程化。</p>
+</blockquote>
+<ul>
+<li><strong>UniClawBench 首个能力驱动的现实 agent 基准，400双语任务</strong>（arXiv） — 为现实世界 agent 提供更细粒度和真实的评测方式 <a href="https://arxiv.org/abs/2607.08768" target="_blank" rel="noopener">原文</a></li>
+<li><strong>L-MAD: A Systematic Evaluation of Multi-Agent Debate Structures in Legal Reasoning</strong>（arXiv） — 首次追踪，暂无前序对比 <a href="https://arxiv.org/abs/2607.09099" target="_blank" rel="noopener">原文</a></li>
+<li><strong>AgentLocate 定位多Agent系统故障节点与首个错误步骤</strong>（arXiv） — 自动定位多Agent系统中哪个代理何时出错，简化调试 <a href="https://arxiv.org/abs/2607.07989" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Agent 运行时与编排（本周 1 条） 🎯</h3>
+<ul>
+<li>⭐ <strong>ABot-AgentOS：通用机器人Agent操作系统附终身多模态记忆</strong>（arXiv） — 让机器人能长时间记住经验并自我改进，在复杂场景可靠执行长任务 <a href="https://arxiv.org/abs/2607.10350" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h2>🏢 大厂动态</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>公司</th><th>本周战略信号</th><th>关键动作</th></tr></thead>
+<tbody>
+<tr><td>OpenAI</td><td>本周无高信号公开动作</td><td>—</td></tr>
+<tr><td>Google</td><td>—</td><td><a href="https://github.com/google-deepmind/alphagenome_research/releases/tag/v0.3.0" target="_blank" rel="noopener">AlphaGenome v0.3.0 新增 indel 拼接并改进微调</a>；<a href="https://deepmind.google/blog/empowering-indias-next-generation-of-innovators-with-atl-saathi/" target="_blank" rel="noopener">Empowering India’s next generation of innovators with ATL Saathi</a></td></tr>
+<tr><td>Anthropic</td><td>—</td><td><a href="https://www.anthropic.com/news/claude-sonnet-5" target="_blank" rel="noopener">Claude Sonnet 5发布：最强agent能力的编程模型</a>；<a href="https://www.anthropic.com/news/golden-gate-claude" target="_blank" rel="noopener">放大金门大桥特征可操控Claude对话焦点</a>；<a href="https://www.anthropic.com/news/strategic-warning-for-ai-risk-progress-and-insights-from-our-frontier-red-team" target="_blank" rel="noopener">Anthropic红队分享前沿AI模型国家安全风险分析</a></td></tr>
+<tr><td>Meta</td><td>本周无高信号公开动作</td><td>—</td></tr>
+<tr><td>Microsoft</td><td>本周无高信号公开动作</td><td>—</td></tr>
+</tbody></table></div>
+<h2>🔭 下周关注</h2>
+<ul>
+<li>Claude Sonnet 5在SWE-bench等编码基准上的实测表现是否超越GPT-4.1。</li>
+<li>小米是否开源U0世界模型，以及具身智能赛道其他厂商的跟进动作。</li>
+</ul>
+<hr>
+<blockquote>
+<p>数据窗口：近 7 天 ｜ 入选 52 条（arXiv 47 / GitHub 1 / 博客 4），另有 34 条低相关条目已过滤（仅归档）｜ 由 ai-insight-dashboard 自动生成</p>
+</blockquote>
+</main>
+<footer>由 <a href="https://github.com/SmileTAT/ai-insight-dashboard" target="_blank" rel="noopener">ai-insight-dashboard</a> 自动生成</footer>
+</body>
+</html>
