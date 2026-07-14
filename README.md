@@ -4,6 +4,7 @@
 
 - 📄 产品需求文档：[docs/PRD.md](docs/PRD.md)
 - 📊 周报：[reports/weekly/](reports/weekly/) ｜ 月报：[reports/monthly/](reports/monthly/)
+- 🌐 网页版：`docs/` 目录自动生成静态站。**首次启用**：仓库 Settings → Pages → Deploy from a branch → `main` + `/docs`，之后访问 `https://smiletat.github.io/ai-insight-dashboard/`
 
 ## 工作原理
 

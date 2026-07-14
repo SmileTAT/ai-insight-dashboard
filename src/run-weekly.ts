@@ -8,6 +8,7 @@ import { classifyItems } from './analysis/classify.js';
 import { llmUsage } from './analysis/llm.js';
 import { archiveWeek, archivedIds } from './archive.js';
 import { buildWeeklyReport } from './report/weekly.js';
+import { rebuildSite } from './site/html.js';
 import { loadState, saveState } from './util/state.js';
 import { daysAgo, ymd } from './util/dates.js';
 import type { InsightItem } from './types.js';
@@ -64,6 +65,9 @@ async function main(): Promise<void> {
   const reportFile = join('reports', 'weekly', `${ymd(now)}.md`);
   writeFileSync(reportFile, report);
   console.log(`[weekly] 周报已生成 → ${reportFile}`);
+
+  const indexFile = rebuildSite();
+  console.log(`[weekly] 网页版已更新 → ${indexFile}`);
 
   state.last_weekly_run = now.toISOString();
   for (const i of githubItems) state.seen_github_ids.push(i.id);

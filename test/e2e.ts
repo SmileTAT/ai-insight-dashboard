@@ -94,6 +94,7 @@ const llmClassify = (userContent: string) => {
         improvement: i.id.startsWith('arxiv:2607.00001')
           ? '以 MoE 架构超越稠密基线'
           : '首次追踪，暂无前序对比',
+        takeaway: isCustomerStory ? '一篇客户宣传稿' : '大模型训练成本有了直降四成的新路子',
       };
     }),
   );
@@ -169,7 +170,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
       const headline = items.find((i) => i.id.startsWith('arxiv:2607.00001'));
       content = JSON.stringify({
         tldr: ['Agent 工具链密集发布', 'MoE 架构研究升温', '大厂竞争聚焦 Agent 基础设施'],
-        headlines: headline ? [{ id: headline.id, why: 'MoE 效率突破将重塑基础模型成本结构' }] : [],
+        headlines: headline
+          ? [
+              {
+                id: headline.id,
+                what: 'MoE 架构扩展到万亿参数并保持训练稳定',
+                how: '通过专家路由稀疏化实现',
+                why: 'MoE 效率突破将重塑基础模型成本结构',
+              },
+            ]
+          : [],
+        editors_note: '我认为本周 MoE 方向被低估了，市场注意力都在 Agent 上。',
         direction_summaries: { 'gui-agent': 'GUI Agent 工具链本周密集更新' },
         company_signals: { openai: '发力 Agent SDK 生态', anthropic: '强化工具调用能力' },
         watch: ['OpenAI Agent SDK 后续版本'],
@@ -237,9 +248,14 @@ assert.ok(existsSync(weeklyFile), '周报文件应存在');
 const weekly = readFileSync(weeklyFile, 'utf8');
 assert.match(weekly, /## 📌 本周要点/, '周报应包含要点区');
 assert.match(weekly, /Agent 工具链密集发布/, '周报应包含 LLM 要点');
+assert.match(weekly, /## 💬 编辑观察/, '周报应包含编辑观察栏目');
+assert.match(weekly, /MoE 方向被低估/, '编辑观察应有观点内容');
 assert.match(weekly, /## 🎯 本周头条/, '周报应包含头条区');
-assert.match(weekly, /MoE 效率突破将重塑基础模型成本结构/, '头条应包含为什么重要');
-assert.match(weekly, /以 MoE 架构超越稠密基线/, '周报应包含改进点提炼');
+assert.match(weekly, /\*\*发生了什么\*\*：MoE 架构扩展到万亿参数/, '头条应有三段式 what');
+assert.match(weekly, /\*\*怎么做到的\*\*：通过专家路由稀疏化实现/, '头条应有三段式 how');
+assert.match(weekly, /\*\*为什么重要\*\*：MoE 效率突破将重塑基础模型成本结构/, '头条应有三段式 why');
+assert.match(weekly, /第 1 期 ｜ 预计阅读 \d+ 分钟/, '报头应含期号与阅读时长');
+assert.match(weekly, /大模型训练成本有了直降四成的新路子/, '条目行应展示人话版 takeaway');
 assert.match(weekly, /## 🔬 研究方向雷达/, '周报应包含研究方向雷达');
 assert.match(weekly, /GUI Agent 与计算机使用（本周 \d+ 条） 🎯/, '关注方向应有 🎯 标记');
 assert.match(weekly, /GUI Agent 工具链本周密集更新/, '方向小结应渲染');
@@ -254,6 +270,20 @@ const year = ymd.slice(0, 4);
 const weekDir = readdirSync(join(workdir, 'data', year))[0];
 const archiveJson = readFileSync(join(workdir, 'data', year, weekDir, 'items.json'), 'utf8');
 assert.match(archiveJson, /customer-story-acme/, '低相关条目应保留在归档中');
+
+// 网页版产物：单期页面 + 首页目录
+const weeklyHtmlFile = join(workdir, 'docs', 'weekly', `${ymd}.html`);
+assert.ok(existsSync(weeklyHtmlFile), '周报 HTML 页面应生成');
+const weeklyHtml = readFileSync(weeklyHtmlFile, 'utf8');
+assert.match(weeklyHtml, /<style>/, 'HTML 应内联 CSS');
+assert.match(weeklyHtml, /编辑观察/, 'HTML 应包含编辑观察');
+assert.match(weeklyHtml, /<table>/, 'HTML 应渲染大厂表格');
+assert.match(weeklyHtml, /<a href="https:\/\/arxiv\.org/, 'HTML 应渲染原文链接');
+assert.ok(!weeklyHtml.includes('**'), 'HTML 中不应残留 markdown 粗体标记');
+const indexHtml = readFileSync(join(workdir, 'docs', 'index.html'), 'utf8');
+assert.match(indexHtml, new RegExp(`weekly/${ymd}\\.html`), '首页目录应链接到本期周报');
+assert.match(indexHtml, /最新一期要点/, '首页应展示最新一期要点摘要');
+assert.ok(existsSync(join(workdir, 'docs', '.nojekyll')), '应生成 .nojekyll');
 
 const archiveFiles = readFileSync(join(workdir, 'state.json'), 'utf8');
 assert.match(archiveFiles, /github:repo:openai\/new-agent-sdk/, 'state 应记录已见 GitHub 条目');

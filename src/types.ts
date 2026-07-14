@@ -29,10 +29,12 @@ export interface AiTags {
   keywords: string[];
   /** 战略参考价值 1-5；低于阈值只归档不进报告（拦截客户案例/公关文） */
   relevance: number;
-  /** LLM 生成的中文短标题（≤20 字），报告展示用 */
+  /** LLM 生成的结论式中文标题（≤28 字，含关键数字/claim），报告展示用 */
   title_zh?: string;
   /** 相较前序工作的改进点；无依据时为"首次追踪，暂无前序对比" */
   improvement?: string;
+  /** 人话版一句结论（≤40 字，≤1 个术语），条目行展示用 */
+  takeaway?: string;
 }
 
 export interface InsightItem {

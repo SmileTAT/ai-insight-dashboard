@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadItemsForMonth } from './archive.js';
 import { buildMonthlyReport } from './report/monthly.js';
+import { rebuildSite } from './site/html.js';
 import { llmUsage } from './analysis/llm.js';
 import { previousMonth } from './util/dates.js';
 
@@ -22,6 +23,9 @@ async function main(): Promise<void> {
   const reportFile = join('reports', 'monthly', `${month}.md`);
   writeFileSync(reportFile, report);
   console.log(`[monthly] 月报已生成 → ${reportFile}`);
+
+  const indexFile = rebuildSite();
+  console.log(`[monthly] 网页版已更新 → ${indexFile}`);
 
   const usage = llmUsage();
   console.log(`[monthly] LLM 用量：${usage.requests} 次请求 / ${usage.total_tokens} tokens`);
