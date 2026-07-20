@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 情报周报 | 2026-07-20</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1a1a1a;--muted:#6b6b6b;--card:#ffffff;--line:#e6e3dd;--accent:#b45309;--accent-soft:#fef3e2;--quote:#f5f1ea;--link:#0f5ea8}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--fg:#e8e6e1;--muted:#9a988f;--card:#1e1e1c;--line:#33312c;--accent:#f59e0b;--accent-soft:#2a2010;--quote:#232019;--link:#7db8e8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:.7rem 1rem;display:flex;gap:1.2rem;align-items:baseline;z-index:9}
+nav .brand{font-weight:700;color:var(--fg);text-decoration:none}
+nav a{color:var(--muted);text-decoration:none;font-size:.9rem}
+nav a:hover{color:var(--accent)}
+main{max-width:46rem;margin:0 auto;padding:1.5rem 1.2rem 4rem}
+h1{font-size:1.7rem;line-height:1.35;margin:1rem 0 .4rem}
+h2{font-size:1.25rem;margin:2.2rem 0 .8rem;padding-bottom:.35rem;border-bottom:2px solid var(--line)}
+h3{font-size:1.05rem;margin:1.4rem 0 .5rem}
+a{color:var(--link)}
+ul{padding-left:1.2rem;margin:.4rem 0}
+li{margin:.45rem 0}
+blockquote{margin:.8rem 0;padding:.7rem 1rem;background:var(--quote);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--fg)}
+blockquote p{margin:.2rem 0}
+hr{border:none;border-top:1px solid var(--line);margin:2rem 0}
+.table-wrap{overflow-x:auto;margin:.8rem 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);white-space:nowrap}
+.issue-list{list-style:none;padding:0}
+.issue-list li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1.1rem;margin:.6rem 0}
+.issue-list a{font-weight:600;text-decoration:none}
+.issue-list .meta{color:var(--muted);font-size:.85rem;margin-left:.6rem}
+footer{color:var(--muted);font-size:.85rem;text-align:center;padding:2rem 0}
+</style>
+</head>
+<body>
+<nav><a class="brand" href="../index.html">AI 情报周刊</a><a href="../index.html">往期</a></nav>
+<main>
+<h1>AI 情报周报 | 2026-07-20</h1>
+<blockquote>
+<p>第 2 期 ｜ 预计阅读 9 分钟</p>
+</blockquote>
+<h2>📌 本周要点</h2>
+<ul>
+<li>GRPO对4B-8B Web Agent无提升，过高学习率反造成损害，挑战主流假设。</li>
+<li>Muon优化器让Agent RL成功率提升88%，但AdamW高学习率无效。</li>
+<li>ToolVerse用400个MCP构建4500工具环境，强化Agent RL训练。</li>
+</ul>
+<h2>💬 编辑观察</h2>
+<blockquote>
+<p>本周Agent RL领域出现明显矛盾信号：Muon优化器带来88%的提升，但GRPO在小模型上完全失效。我认为行业过度关注算法框架而低估了优化器选择和模型规模的影响。同时，SeerGuard用世界模型做预执行风险评估，将安全分数从0.191跃升至0.596，这比任何事后过滤都更具实用性，但被市场忽略了。此外，ToolVerse构建的大规模MCP工具环境可能是推动Agent RL质变的关键基础设施，建议密切关注后续成果。</p>
+</blockquote>
+<h2>🎯 本周头条</h2>
+<h3>Muon优化器让agent强化学习成功率提升88%</h3>
+<p><strong>发生了什么</strong>：Muon优化器在GiGPO下将Agent RL成功率从0.290提升至0.546（+88%），而AdamW高学习率完全无效。</p>
+<p><strong>怎么做到的</strong>：通过替代AdamW优化器，Muon在训练过程中更稳定地更新策略。</p>
+<p><strong>为什么重要</strong>：揭示优化器选择对Agent RL效果影响远大于预期，以往被忽视的优化器超参门控机制成为关键瓶颈，改写了Agent RL训练实践。</p>
+<p><a href="https://arxiv.org/abs/2607.16169" target="_blank" rel="noopener">原文</a>（arXiv）</p>
+<h3>GRPO对4B-8B web agent无提升，过高学习率反造成损害</h3>
+<p><strong>发生了什么</strong>：首次严格验证GRPO在4B-8B Web Agent上无提升，过高学习率反而损害性能。</p>
+<p><strong>怎么做到的</strong>：系统测试不同学习率下GRPO在小规模agent上的效果。</p>
+<p><strong>为什么重要</strong>：挑战了将大规模语言模型RL经验直接迁移到agent领域的假设，表明小规模agent RL需要专用方法，行业应重新评估在中小模型上应用GRPO的投入。</p>
+<p><a href="https://arxiv.org/abs/2607.12640" target="_blank" rel="noopener">原文</a>（arXiv）</p>
+<h3>ToolVerse用400个MCP构建4500工具环境强化Agent RL</h3>
+<p><strong>发生了什么</strong>：ToolVerse从近400个MCP构建了约4500工具的可执行环境，用于强化Agent RL。</p>
+<p><strong>怎么做到的</strong>：通过集成现有MCP服务器构建大规模工具生态，并设计图解锁采样和细粒度奖励算法。</p>
+<p><strong>为什么重要</strong>：为Agent RL提供了前所未有的工具多样性基础设施，使得训练更通用、更鲁棒的tool-use agent成为可能，弥补了此前工具环境规模不足的缺陷。</p>
+<p><a href="https://arxiv.org/abs/2607.15660" target="_blank" rel="noopener">原文</a>（arXiv）</p>
+<h2>🔬 研究方向雷达</h2>
+<blockquote>
+<p>ℹ️ 关注方向本周无高信号动态：编码 Agent、语音与实时交互 Agent、Agentic RL 训练、Agent 运行时与编排、Agent 评测与可靠性</p>
+</blockquote>
+<h3>📡 多智能体协作（本周 4 条） 🎯</h3>
+<blockquote>
+<p>ReasFlow数学发现，BrainPilot脑科学，政党联盟模拟，城市剖析，评审精度高但批评采纳率低。</p>
+</blockquote>
+<ul>
+<li><strong>ReasFlow多Agent系统辅助应用数学推理发现</strong>（arXiv） — 让AI agent像研究生一样协助数学家进行推理验证和知识检索 <a href="https://arxiv.org/abs/2607.14178" target="_blank" rel="noopener">原文</a></li>
+<li><strong>Digital Pantheon 多 agent 框架模拟政党联盟并实现条款溯源</strong>（arXiv） — 用 LLM agent 模拟政治谈判，还能追溯每条条款的来源 <a href="https://arxiv.org/abs/2607.15095" target="_blank" rel="noopener">原文</a></li>
+<li><strong>UrbanAgent 用多agent协作推理提升城市区域剖析鲁棒性</strong>（arXiv） — 多agent分工处理不同城市数据，通过协作推理减少模态冲突。 <a href="https://arxiv.org/abs/2607.13558" target="_blank" rel="noopener">原文</a></li>
+<li><strong>多Agent数学推理发现：评审精度高≠批评被采纳</strong>（arXiv） — 多Agent协作中，批评者专业但无人听，不如平级讨论有效 <a href="https://arxiv.org/abs/2607.15388" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Deep Research 型 Agent（本周 4 条） 🎯</h3>
+<blockquote>
+<p>SLEUTH多跳推理提升11点，BrainPilot多Agent系统，CANA因果类比，端侧研究agent局限性。</p>
+</blockquote>
+<ul>
+<li><strong>BrainPilot开源多Agent系统，7233项知识库加速脑科学发现</strong>（arXiv） — 用多Agent协作自动化脑科学研究流程，从文献到分析再到结果解读 <a href="https://arxiv.org/abs/2607.15079" target="_blank" rel="noopener">原文</a></li>
+<li><strong>CANA 用因果分解让 LLM agent 找到历史类比做前瞻分析</strong>（arXiv） — 让 AI 像人一样用历史案例做预测分析 <a href="https://arxiv.org/abs/2607.13602" target="_blank" rel="noopener">原文</a></li>
+<li><strong>端侧4B研究agent：暴露量限忠实性，检索质量限覆盖率</strong>（arXiv） — 给端侧agent更多源文本比更好检索更能提升引用可信度 <a href="https://arxiv.org/abs/2607.12257" target="_blank" rel="noopener">原文</a></li>
+<li><strong>FinResearchBench II用LLM替代人类评估金融深度报告</strong>（arXiv） — 深度研究Agent的金融报告质量可被AI自动评估，免去人工 <a href="https://arxiv.org/abs/2607.12252" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Agent 自我进化（本周 3 条） 🎯</h3>
+<blockquote>
+<p>自进化策略蒸馏（SEED）、技能-策略共进化（SPyCE）、记忆图纠错、反事实工具锚点等方向活跃。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>SEED自进化策略蒸馏：Agent RL从轨迹中自动提取技能</strong>（arXiv） — 让大模型在强化学习中自动从历史经验提炼可复用技能，提升决策质量 <a href="https://arxiv.org/abs/2607.14777" target="_blank" rel="noopener">原文</a></li>
+<li>⭐ <strong>SPyCE技能-策略共进化：多模态Agent在训练中自动积累工具使用模式</strong>（arXiv） — 智能体在强化训练中同时学习技能库和策略，避免从零开始发现工具用法 <a href="https://arxiv.org/abs/2607.13854" target="_blank" rel="noopener">原文</a></li>
+<li><strong>Agent自我改进综述：系统框架梳理学术界进展</strong>（arXiv） — 一篇系统梳理agent如何从经验中自我改进的综述 <a href="https://arxiv.org/abs/2607.13104" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 Agent 安全（本周 3 条） 🎯</h3>
+<blockquote>
+<p>记忆持久化引入新攻击面，SingGuard发布四款护栏模型F1达94%，安全评估考虑成本维度。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>记忆持久化让agent提示注入风险升级，攻击成功率不低</strong>（arXiv） — 给agent长期记忆要小心，恶意指令可能潜伏影响。 <a href="https://arxiv.org/abs/2607.14611" target="_blank" rel="noopener">原文</a></li>
+<li>⭐ <strong>SingGuard发布四款Agent安全护栏模型，F1达94%以上</strong>（arXiv） — 有了可实际部署的Agent安全防护模型，实时检测威胁 <a href="https://arxiv.org/abs/2607.13081" target="_blank" rel="noopener">原文</a></li>
+<li><strong>安全Agent评估新视角：考虑推理和工具调用成本</strong>（arXiv） — 安全Agent成功不止看最终结果，还要考虑实际运行成本 <a href="https://arxiv.org/abs/2607.15263" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 规划与长程任务（本周 2 条） 🎯</h3>
+<blockquote>
+<p>DAG替代线性轨迹（TopoAgent）和结构化记忆（SLEUTH）推动科学推理和跨任务规划。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>TopoAgent用DAG替代线性轨迹，科学推理超越SOTA</strong>（arXiv） — 用有向无环图管理推理步骤，避免长上下文幻觉，提升科学问题分析可靠性 <a href="https://arxiv.org/abs/2607.14658" target="_blank" rel="noopener">原文</a></li>
+<li>⭐ <strong>SLEUTH 结构化记忆让语言agent多跳推理提升11个点</strong>（arXiv） — 给推理agent一个显式的“备忘录”，防止早期发现被遗忘导致推理失败。 <a href="https://arxiv.org/abs/2607.12267" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 GUI Agent 与计算机使用（本周 2 条） 🎯</h3>
+<blockquote>
+<p>SeerGuard用世界模型预执行安全，KnowAct-GUIClaw自演进记忆跨平台GUI。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>SeerGuard 用世界模型预测让移动 GUI agent 安全分数跃升至 0.596</strong>（arXiv） — 让手机 agent 在执行前就能预测风险，大幅降低误操作后果 <a href="https://arxiv.org/abs/2607.15550" target="_blank" rel="noopener">原文</a></li>
+<li><strong>KnowAct-GUIClaw 用自演进记忆和技能提升跨平台 GUI 操作</strong>（arXiv） — 让 GUI agent 能跨平台操作并不断积累经验变强 <a href="https://arxiv.org/abs/2607.12625" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 工具调用与 MCP 协议（本周 2 条） 🎯</h3>
+<blockquote>
+<p>MCP生态持续扩张，ToolVerse集成400+ MCP构建4500工具环境，微软也推出MCP Java演示。</p>
+</blockquote>
+<ul>
+<li><strong>ToolAnchor用反事实锚点打破agent工具惯性，扩展集表现稳定</strong>（arXiv） — Agent能通过反事实上下文快速适应新工具，无需重新训练 <a href="https://arxiv.org/abs/2607.14145" target="_blank" rel="noopener">原文</a></li>
+<li><strong>微软发布MCP Java演示：Copilot+Spring AI构建可扩展App</strong>（GitHub/Microsoft） — 展示用GitHub Copilot快速构建和测试MCP应用的完整流程 <a href="https://github.com/microsoft/github-copilot-java-mcp-demo" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h3>📡 记忆与个性化（本周 2 条） 🎯</h3>
+<blockquote>
+<p>MemCon自适应管理，KnowAct-GUIClaw自演进，经验记忆图一次纠错。</p>
+</blockquote>
+<ul>
+<li>⭐ <strong>MemCon 学会自适应管理agent记忆，无需人工规则</strong>（arXiv） — agent的记忆可以像玩游戏一样学会最优读写时机，提升效率。 <a href="https://arxiv.org/abs/2607.13591" target="_blank" rel="noopener">原文</a></li>
+<li><strong>经验记忆图：通过图匹配一次矫正agent错误，替代迭代试错</strong>（arXiv） — Agent可用记忆图匹配直接找到修正方法，避免反复试错 <a href="https://arxiv.org/abs/2607.13884" target="_blank" rel="noopener">原文</a></li>
+</ul>
+<h2>🏢 大厂动态</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>公司</th><th>本周战略信号</th><th>关键动作</th></tr></thead>
+<tbody>
+<tr><td>OpenAI</td><td>本周无高信号公开动作</td><td>—</td></tr>
+<tr><td>Google</td><td>本周无高信号公开动作</td><td>—</td></tr>
+<tr><td>Anthropic</td><td>本周无高信号公开动作</td><td>—</td></tr>
+<tr><td>Meta</td><td>本周无高信号公开动作</td><td>—</td></tr>
+<tr><td>Microsoft</td><td>通过Durable Task扩展和MCP Java演示，加速Agent框架生态落地和工具集成。</td><td><a href="https://github.com/microsoft/agent-framework-durable-extension" target="_blank" rel="noopener">微软Agent框架新增Durable Task扩展，支持持久化任务</a>；<a href="https://github.com/microsoft/github-copilot-java-mcp-demo" target="_blank" rel="noopener">微软发布MCP Java演示：Copilot+Spring AI构建可扩展App</a></td></tr>
+</tbody></table></div>
+<h2>🔭 下周关注</h2>
+<ul>
+<li>Muon优化器在更大模型（&gt;8B）上的Agent RL复现结果</li>
+<li>GRPO失效后，小规模Agent RL专用方法的跟进研究</li>
+</ul>
+<hr>
+<blockquote>
+<p>数据窗口：近 7 天 ｜ 入选 47 条（arXiv 45 / GitHub 2 / 博客 0），另有 11 条低相关条目已过滤（仅归档）｜ 由 ai-insight-dashboard 自动生成</p>
+</blockquote>
+</main>
+<footer>由 <a href="https://github.com/SmileTAT/ai-insight-dashboard" target="_blank" rel="noopener">ai-insight-dashboard</a> 自动生成</footer>
+</body>
+</html>

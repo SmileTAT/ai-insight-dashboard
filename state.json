@@ -1,4 +1,5 @@
 {
+  "last_weekly_run": "2026-07-20T03:43:54.240Z",
   "seen_blog_urls": {
     "openai-news": [
       "https://openai.com/index/equipping-workers-with-insights-about-compensation/",
@@ -183,7 +184,9 @@
       "https://openai.com/index/john-deere-justin-rose/",
       "https://openai.com/index/diagnose-rare-childhood-diseases/",
       "https://openai.com/index/gpt-5-immunology-mystery/",
-      "https://openai.com/index/using-codex-to-simulate-black-holes/"
+      "https://openai.com/index/using-codex-to-simulate-black-holes/",
+      "https://openai.com/index/cars24/",
+      "https://openai.com/index/managing-ai-investments-in-agentic-era/"
     ],
     "deepmind-blog": [
       "https://deepmind.google/blog/empowering-indias-next-generation-of-innovators-with-atl-saathi/",
@@ -285,7 +288,8 @@
       "https://deepmind.google/blog/introducing-gemma-3-270m-the-compact-model-for-hyper-efficient-ai/",
       "https://deepmind.google/blog/image-editing-in-gemini-just-got-a-major-upgrade/",
       "https://deepmind.google/blog/vaultgemma-the-worlds-most-capable-differentially-private-llm/",
-      "https://deepmind.google/blog/introducing-the-gemini-25-computer-use-model/"
+      "https://deepmind.google/blog/introducing-the-gemini-25-computer-use-model/",
+      "https://deepmind.google/blog/our-approach-to-bioresilience/"
     ],
     "anthropic-news": [
       "https://www.anthropic.com/news/100k-context-windows",
@@ -538,7 +542,11 @@
     "github:repo:anthropics/k12-teacher-skills",
     "github:repo:microsoft/new-copilot-studio-tech-guide-kr",
     "github:repo:microsoft/CopilotScope",
-    "github:repo:microsoft/CoworkDashboard"
-  ],
-  "last_weekly_run": "2026-07-14T15:39:48.631Z"
+    "github:repo:microsoft/CoworkDashboard",
+    "github:repo:openai/redcard",
+    "github:repo:microsoft/github-copilot-java-mcp-demo",
+    "github:repo:microsoft/cobol-docs-pipeline-sample",
+    "github:repo:microsoft/gopherconus-26-booth-exercises",
+    "github:repo:microsoft/agent-framework-durable-extension"
+  ]
 }
